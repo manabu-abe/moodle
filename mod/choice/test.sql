@@ -1,1 +1,2 @@
 test
+version 2
