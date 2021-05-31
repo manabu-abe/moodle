@@ -1284,7 +1284,7 @@ function fix_utf8($value) {
         if ($buggyiconv) {
             if (function_exists('mb_convert_encoding')) {
                 $subst = mb_substitute_character();
-                mb_substitute_character('');
+                mb_substitute_character('none');
                 $result = mb_convert_encoding($value, 'utf-8', 'utf-8');
                 mb_substitute_character($subst);
 
@@ -1690,7 +1690,6 @@ function purge_caches($options = []) {
  */
 function purge_other_caches() {
     global $DB, $CFG;
-    core_text::reset_caches();
     if (class_exists('core_plugin_manager')) {
         core_plugin_manager::reset_caches();
     }
@@ -7847,15 +7846,30 @@ function get_list_of_plugins($directory='mod', $exclude='', $basedir='') {
         unset($subtypes);
     }
 
+    $ignorelist = array_flip(array_filter([
+        'CVS',
+        '_vti_cnf',
+        'amd',
+        'classes',
+        'simpletest',
+        'tests',
+        'yui',
+        $exclude,
+    ]));
+
     if (file_exists($basedir) && filetype($basedir) == 'dir') {
         if (!$dirhandle = opendir($basedir)) {
             debugging("Directory permission error for plugin ({$directory}). Directory exists but cannot be read.", DEBUG_DEVELOPER);
             return array();
         }
         while (false !== ($dir = readdir($dirhandle))) {
-            // Func: strpos is marginally but reliably faster than substr($dir, 0, 1).
-            if (strpos($dir, '.') === 0 or $dir === 'CVS' or $dir === '_vti_cnf' or $dir === 'simpletest' or $dir === 'yui' or
-                $dir === 'tests' or $dir === 'classes' or $dir === $exclude) {
+            if (strpos($dir, '.') === 0) {
+                // Ignore directories starting with .
+                // These are treated as hidden directories.
+                continue;
+            }
+            if (array_key_exists($dir, $ignorelist)) {
+                // This directory features on the ignore list.
                 continue;
             }
             if (filetype($basedir .'/'. $dir) != 'dir') {

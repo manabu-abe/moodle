@@ -51,12 +51,6 @@
     border-bottom: $border-width solid $table-border-color;
 }
 
-@include media-breakpoint-up(sm) {
-    .mform > .form-group {
-        margin-left: $spacer * 1.5;
-    }
-}
-
 #adminsettings .form-control[size] {
     width: auto;
 }
@@ -338,6 +332,16 @@ fieldset.coursesearchbox label {
     font-size: large;
 }
 
+select.form-control {
+    &[size],
+    &[multiple] {
+        padding-right: 0;
+        option {
+            width: fit-content;
+        }
+    }
+}
+
 /* Non-bootstrap selects with a size show their contents outside of the element.
  * Remove when we update to stable bootstrap 4. (MDL-56511) */
 select[size],
@@ -421,12 +425,8 @@ textarea[data-auto-rows] {
 }
 
 @include media-breakpoint-up(sm) {
-    .mform fieldset {
-        margin-left: $spacer * 1.5;
-    }
     .mform fieldset.collapsible legend a.fheader {
         padding: 0 5px 0 ($spacer * 1.5);
-        margin-left: -($spacer * 1.5);
         background: url([[pix:t/expanded]]) 0 center no-repeat;
     }
 
@@ -436,6 +436,9 @@ textarea[data-auto-rows] {
         */
         /*rtl:remove*/
         background-image: url([[pix:t/collapsed]]);
+    }
+    .mform fieldset.collapsible .col-form-label {
+        padding-left: ($spacer * 2.5);
     }
 
     .mform {
